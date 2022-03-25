@@ -12,10 +12,31 @@
   ],
   "activationEvents": [
     "onCommand:mob-vscode-gui.start",
+    "onCommand:mob-vscode-gui.next",
+    "onCommand:mob-vscode-gui.done",
     "onView:mobUtils"
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "menus": {
+      "view/title": [
+        {
+          "command": "mob-vscode-gui.start",
+          "when": "view == mobUtils",
+          "group": "navigation@1"
+        },
+        {
+          "command": "mob-vscode-gui.next",
+          "when": "view == mobUtils",
+          "group": "navigation@2"
+        },
+        {
+          "command": "mob-vscode-gui.done",
+          "when": "view == mobUtils",
+          "group": "navigation@3"
+        }
+      ]
+    },
     "views": {
       "scm": [
         {
@@ -27,9 +48,21 @@
     "commands": [
       {
         "command": "mob-vscode-gui.start",
-        "title": "Start Mob",
+        "title": "Start",
         "category": "MobVSCodeGui",
-        "icon": "$(add)"
+        "icon": "$(debug-start)"
+      },
+      {
+        "command": "mob-vscode-gui.next",
+        "title": "Next",
+        "category": "MobVSCodeGui",
+        "icon": "$(debug-step-over)"
+      },
+      {
+        "command": "mob-vscode-gui.done",
+        "title": "Done",
+        "category": "MobVSCodeGui",
+        "icon": "$(check)"
       }
     ]
   },

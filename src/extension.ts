@@ -1,35 +1,30 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import { NodeDependenciesProvider } from "./views/tree-data-provider";
+import { MobViewProvider } from "./views/mob-view-provider";
 
 vscode.window.createTreeView("mobUtils", {
-  treeDataProvider: new NodeDependenciesProvider(
-    "/home/alessandrosangalli/Github/mob-vscode-gui"
-  ),
+  treeDataProvider: new MobViewProvider(),
 });
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  // Use the console to output diagnostic information (console.log) and errors (console.error)
-  // This line of code will only be executed once when your extension is activated
-  console.log(
-    'Congratulations, your extension "mob-vscode-gui" is now active!'
-  );
+  const terminal = vscode.window.createTerminal(`Ext Mob GUI terminal}`);
 
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with registerCommand
-  // The commandId parameter must match the command field in package.json
-  let disposable = vscode.commands.registerCommand(
-    "mob-vscode-gui.start",
-    () => {
-      const terminal = vscode.window.createTerminal(`Ext Terminal #++}`);
+  let commands = [
+    vscode.commands.registerCommand("mob-vscode-gui.start", () => {
       terminal.sendText("mob start");
-    }
-  );
+    }),
+    vscode.commands.registerCommand("mob-vscode-gui.next", () => {
+      terminal.sendText("mob next");
+    }),
+    vscode.commands.registerCommand("mob-vscode-gui.done", () => {
+      terminal.sendText("mob done");
+    }),
+  ];
 
-  context.subscriptions.push(disposable);
+  for (const command of commands) {
+    context.subscriptions.push(command);
+  }
 }
 
 // this method is called when your extension is deactivated
