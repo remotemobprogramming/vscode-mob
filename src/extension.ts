@@ -19,11 +19,13 @@ export function activate(context: vscode.ExtensionContext) {
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand
   // The commandId parameter must match the command field in package.json
-  let disposable = vscode.commands.registerCommand("mob-sh.helloWorld", () => {
-    // The code you place here will be executed every time your command is executed
-    // Display a message box to the user
-    vscode.window.showInformationMessage("Hello World from mob-sh!");
-  });
+  let disposable = vscode.commands.registerCommand(
+    "mob-vscode-gui.start",
+    () => {
+      const terminal = vscode.window.createTerminal(`Ext Terminal #++}`);
+      terminal.sendText("mob start");
+    }
+  );
 
   context.subscriptions.push(disposable);
 }
