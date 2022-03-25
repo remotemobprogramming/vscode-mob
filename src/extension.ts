@@ -5,7 +5,7 @@ import { NodeDependenciesProvider } from "./views/tree-data-provider";
 
 vscode.window.createTreeView("mobUtils", {
   treeDataProvider: new NodeDependenciesProvider(
-    "/home/alessandrosangalli/Github/mob-sh"
+    "/home/alessandrosangalli/Github/mob-vscode-gui"
   ),
 });
 
@@ -14,7 +14,9 @@ vscode.window.createTreeView("mobUtils", {
 export function activate(context: vscode.ExtensionContext) {
   // Use the console to output diagnostic information (console.log) and errors (console.error)
   // This line of code will only be executed once when your extension is activated
-  console.log('Congratulations, your extension "mob-sh" is now active!');
+  console.log(
+    'Congratulations, your extension "mob-vscode-gui" is now active!'
+  );
 
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with registerCommand

@@ -1,7 +1,7 @@
 {
-  "name": "mob-sh",
-  "displayName": "mob-sh",
-  "description": "mob.sh wrapper",
+  "name": "mob-vscode-gui",
+  "displayName": "mob-vscode-gui",
+  "description": "A mob.sh wrapper",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.65.0"
