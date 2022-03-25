@@ -1,4 +1,4 @@
-# mob-vscode-gui README
+# Mob VSCode GUI
 
 Mob VSCode GUI is a wrapper of https://mob.sh/. Install it and enjoy :)
 
