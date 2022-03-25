@@ -3,6 +3,7 @@
   "displayName": "Mob VSCode GUI",
   "description": "A mob.sh wrapper",
   "version": "1.0.0",
+  "icon": "images/mob.png",
   "keywords": [
     "mob",
     "pairs",
