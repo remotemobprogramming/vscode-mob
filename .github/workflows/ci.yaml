@@ -41,8 +41,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
         run: npx semantic-release
-      - name: Mob VSCode Gui
-        uses: alessandrosangalli/mob-vscode-gui@master
+      - name: Vscode release plugin
+        uses: JCofman/vscodeaction@master
         env:
           PUBLISHER_TOKEN: ${{ secrets.PUBLISHER_TOKEN }}
         with:
