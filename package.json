@@ -33,7 +33,7 @@
     "viewsWelcome": [
       {
         "view": "mobUtils",
-        "contents": "Mob VSCode GUI is a mob.sh wrapper."
+        "contents": "Watch the mob commands run in your integrated terminal."
       }
     ],
     "menus": {

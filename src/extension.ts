@@ -7,7 +7,7 @@ vscode.window.createTreeView("mobUtils", {
 });
 
 export function activate(context: vscode.ExtensionContext) {
-  const terminal = vscode.window.createTerminal(`Ext Mob GUI terminal}`);
+  const terminal = vscode.window.createTerminal(`Mob Terminal`);
 
   let commands = [
     vscode.commands.registerCommand("mob-vscode-gui.mobCommandExists", () => {
