@@ -2,7 +2,12 @@
   "name": "mob-vscode-gui",
   "displayName": "Mob VSCode GUI",
   "description": "A mob.sh wrapper",
-  "version": "1.0.0",
+  "version": "0.0.1",
+  "keywords": [
+    "mob",
+    "pairs",
+    "ensemble"
+  ],
   "publisher": "alessandrosangalli",
   "private": true,
   "engines": {
