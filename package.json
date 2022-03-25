@@ -32,7 +32,7 @@
     "viewsWelcome": [
       {
         "view": "mobUtils",
-        "contents": "Mob VSCode GUI is a mob.sh wrapper"
+        "contents": "Mob VSCode GUI is a mob.sh wrapper."
       }
     ],
     "menus": {
