@@ -16,10 +16,6 @@ export function activate(context: vscode.ExtensionContext) {
           vscode.window.showErrorMessage(
             "Mob command not found. Please install Mob.sh: https://mob.sh"
           );
-        } else {
-          vscode.window.showInformationMessage(
-            "Mob command found! Please support the Mob.sh project: https://mob.sh/"
-          );
         }
       });
     }),
