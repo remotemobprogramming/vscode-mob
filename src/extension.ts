@@ -24,7 +24,36 @@ export function activate(context: vscode.ExtensionContext) {
       });
     }),
     vscode.commands.registerCommand("mob-vscode-gui.start", () => {
-      terminal.sendText("mob start");
+      const timeInput = vscode.window.showInputBox({
+        title: "How much time?",
+        placeHolder: "Enter to ignore",
+        validateInput: (input) => {
+          if (input === "") {
+            return null;
+          }
+
+          if (!/^\d+$/.test(input)) {
+            return "Please enter a number";
+          }
+
+          if (Number(input) < 1) {
+            return "Please enter a number greater than 0";
+          }
+
+          return null;
+        },
+      });
+
+      timeInput.then((input) => {
+        let command = "mob start";
+        const timer = Number(input);
+
+        if (timer > 0) {
+          command += ` ${timer}`;
+        }
+
+        terminal.sendText(command);
+      });
     }),
     vscode.commands.registerCommand("mob-vscode-gui.next", () => {
       terminal.sendText("mob next");
