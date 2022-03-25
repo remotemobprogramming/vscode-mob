@@ -29,6 +29,12 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
+    "viewsWelcome": [
+      {
+        "view": "mobUtils",
+        "contents": "Mob VSCode GUI is a mob.sh wrapper"
+      }
+    ],
     "menus": {
       "view/title": [
         {
