@@ -124,5 +124,8 @@
     "fail": [
       "@semantic-release/github"
     ]
+  },
+  "dependencies": {
+    "command-exists": "^1.2.9"
   }
 }
