@@ -4,9 +4,7 @@ Mob VSCode GUI is a wrapper of https://mob.sh/. Install it and enjoy :)
 
 ## Features
 
-<p align="center">
-  <img src="https://github.com/remotemobprogramming/mob-vscode-gui/blob/master/images/mob_utils_menu.png" alt="Mob Utils menu" />
-</p>
+![Mob Utils menu](./images/mob_utils_menu.png)
 
 ## Requirements
 
