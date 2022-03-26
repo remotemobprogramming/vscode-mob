@@ -1,12 +1,19 @@
 import * as vscode from "vscode";
-import { MobViewProvider } from "./views/mob-view-provider";
 var commandExists = require("command-exists");
 
-vscode.window.createTreeView("mobUtils", {
-  treeDataProvider: new MobViewProvider(),
-});
-
 export function activate(context: vscode.ExtensionContext) {
+  createStartStatusBarItem(context);
+  createNextStatusBarItem(context);
+  createDoneStatusBarItem(context);
+
+  createCommands(context);
+
+  vscode.commands.executeCommand("mob-vscode-gui.mobCommandExists");
+}
+
+export function deactivate() {}
+
+function createCommands(context: vscode.ExtensionContext) {
   const terminal = vscode.window.createTerminal(`Mob Terminal`);
 
   let commands = [
@@ -62,9 +69,50 @@ export function activate(context: vscode.ExtensionContext) {
   for (const command of commands) {
     context.subscriptions.push(command);
   }
-
-  vscode.commands.executeCommand("mob-vscode-gui.mobCommandExists");
 }
 
-// this method is called when your extension is deactivated
-export function deactivate() {}
+function createStartStatusBarItem(context: vscode.ExtensionContext) {
+  const item = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Left,
+    100
+  );
+
+  item.command = "mob-vscode-gui.start";
+
+  context.subscriptions.push(item);
+
+  item.text = `$(debug-start) Mob Start`;
+  item.tooltip = `Start you turn`;
+
+  item.show();
+}
+
+function createNextStatusBarItem(context: vscode.ExtensionContext) {
+  const item = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Left,
+    100
+  );
+
+  item.command = "mob-vscode-gui.next";
+
+  context.subscriptions.push(item);
+
+  item.text = `$(debug-step-over) Mob Next`;
+  item.tooltip = `Next turn`;
+  item.show();
+}
+
+function createDoneStatusBarItem(context: vscode.ExtensionContext) {
+  const item = vscode.window.createStatusBarItem(
+    vscode.StatusBarAlignment.Left,
+    100
+  );
+
+  item.command = "mob-vscode-gui.done";
+
+  context.subscriptions.push(item);
+
+  item.text = `$(check) Mob Done`;
+  item.tooltip = `Done mob session`;
+  item.show();
+}

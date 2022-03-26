@@ -23,67 +23,10 @@
     "SCM Providers"
   ],
   "activationEvents": [
-    "onCommand:mob-vscode-gui.start",
-    "onCommand:mob-vscode-gui.next",
-    "onCommand:mob-vscode-gui.done",
-    "onView:mobUtils"
+    "*"
   ],
   "main": "./dist/extension.js",
-  "contributes": {
-    "viewsWelcome": [
-      {
-        "view": "mobUtils",
-        "contents": "Watch the mob commands run in your integrated terminal."
-      }
-    ],
-    "menus": {
-      "view/title": [
-        {
-          "command": "mob-vscode-gui.start",
-          "when": "view == mobUtils",
-          "group": "navigation@1"
-        },
-        {
-          "command": "mob-vscode-gui.next",
-          "when": "view == mobUtils",
-          "group": "navigation@2"
-        },
-        {
-          "command": "mob-vscode-gui.done",
-          "when": "view == mobUtils",
-          "group": "navigation@3"
-        }
-      ]
-    },
-    "views": {
-      "scm": [
-        {
-          "id": "mobUtils",
-          "name": "Mob Utils"
-        }
-      ]
-    },
-    "commands": [
-      {
-        "command": "mob-vscode-gui.start",
-        "title": "Start",
-        "category": "MobVSCodeGui",
-        "icon": "$(debug-start)"
-      },
-      {
-        "command": "mob-vscode-gui.next",
-        "title": "Next",
-        "category": "MobVSCodeGui",
-        "icon": "$(debug-step-over)"
-      },
-      {
-        "command": "mob-vscode-gui.done",
-        "title": "Done",
-        "category": "MobVSCodeGui",
-        "icon": "$(check)"
-      }
-    ]
-  },
+  "contributes": {},
   "scripts": {
     "vscode:prepublish": "npm run package",
     "compile": "webpack",
