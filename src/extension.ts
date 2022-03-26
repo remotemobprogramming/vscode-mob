@@ -4,7 +4,7 @@ var commandExists = require("command-exists");
 export function activate(context: vscode.ExtensionContext) {
   createStartStatusBarItem(context);
   createNextStatusBarItem(context);
-  createDoneStatusBarItem(context);
+  createMobStatusBarItem(context);
 
   createCommands(context);
 
@@ -102,17 +102,36 @@ function createNextStatusBarItem(context: vscode.ExtensionContext) {
   item.show();
 }
 
-function createDoneStatusBarItem(context: vscode.ExtensionContext) {
+function createMobStatusBarItem(context: vscode.ExtensionContext) {
+  const myCommandId = "mob-vscode-gui.mobUtilsClick";
+
+  context.subscriptions.push(
+    vscode.commands.registerCommand(myCommandId, async () => {
+      await vscode.window
+        .showQuickPick([
+          {
+            label: "Done",
+            description: "Commit mob session",
+            command: "mob-vscode-gui.done",
+          },
+        ])
+        .then((option) => {
+          if (option) {
+            vscode.commands.executeCommand(option.command);
+          }
+        });
+    })
+  );
+
   const item = vscode.window.createStatusBarItem(
     vscode.StatusBarAlignment.Left,
     100
   );
 
-  item.command = "mob-vscode-gui.done";
-
-  context.subscriptions.push(item);
-
-  item.text = `$(check) Mob Done`;
+  item.command = myCommandId;
+  item.text = `$(menu) Mob Utils`;
   item.tooltip = `Done mob session`;
   item.show();
+
+  context.subscriptions.push(item);
 }
