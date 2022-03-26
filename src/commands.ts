@@ -1,7 +1,8 @@
+import * as childProcess from "child_process";
+import { ExecException } from "child_process";
 import * as vscode from "vscode";
+import { commandErrorHandler } from "./command-error-handler";
 var commandExists = require("command-exists");
-
-const terminal = vscode.window.createTerminal(`Mob Terminal`);
 
 export const commands = [
   vscode.commands.registerCommand("mob-vscode-gui.mobCommandExists", () => {
@@ -35,21 +36,26 @@ export const commands = [
     });
 
     timeInput.then((input) => {
-      let command = "mob start";
+      let command = "mob start --include-uncommitted-changes";
       const timer = Number(input);
 
       if (timer > 0) {
         command += ` ${timer}`;
       }
 
-      terminal.sendText(command);
+      const expectedMessage = ["Happy collaborating!"];
+      exec(command, expectedMessage);
     });
   }),
   vscode.commands.registerCommand("mob-vscode-gui.next", () => {
-    terminal.sendText("mob next");
+    const command = "mob next";
+    const expectedMessage = ["git push --no-verify"];
+    exec(command, expectedMessage);
   }),
   vscode.commands.registerCommand("mob-vscode-gui.done", () => {
-    terminal.sendText("mob done");
+    const command = "mob done";
+    const expectedMessage = ["To finish, use"];
+    exec(command, expectedMessage);
   }),
   vscode.commands.registerCommand("mob-vscode-gui.reset", () => {
     const validInputs = {
@@ -75,8 +81,30 @@ export const commands = [
 
     input.then((input) => {
       if (input && validInputs.yes.includes(input)) {
-        terminal.sendText("mob reset");
+        const command = "mob reset";
+        const expectedMessage = ["Branches", "deleted"];
+        exec(command, expectedMessage);
       }
     });
   }),
 ];
+
+function exec(command: string, expectedMessage: string[]) {
+  if (vscode.workspace.workspaceFolders?.length !== 1) {
+    vscode.window.showWarningMessage(
+      `1 workspace folder required. Found ${Number(
+        vscode.workspace.workspaceFolders?.length
+      )}`
+    );
+    return;
+  }
+
+  const cwd = vscode.workspace.workspaceFolders[0].uri.fsPath;
+  childProcess.exec(
+    command,
+    { cwd },
+    (error: ExecException | null, stdout: string, stderr: string) => {
+      commandErrorHandler({ expectedMessage, error, stdout, stderr });
+    }
+  );
+}
