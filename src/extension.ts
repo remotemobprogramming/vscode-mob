@@ -63,6 +63,11 @@ function createMobStatusBarItem(context: vscode.ExtensionContext) {
             description: "Delete local and remote WIP branch",
             command: "mob-vscode-gui.reset",
           },
+          {
+            label: "Timer",
+            description: "Set timer (in minutes)",
+            command: "mob-vscode-gui.timer",
+          },
         ])
         .then((option) => {
           if (option) {

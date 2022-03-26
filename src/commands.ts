@@ -2,6 +2,7 @@ import * as childProcess from "child_process";
 import { ExecException } from "child_process";
 import * as vscode from "vscode";
 import { commandErrorHandler } from "./command-error-handler";
+import { timerInputValidator } from "./validators/time-input-validator";
 var commandExists = require("command-exists");
 
 export const commands = [
@@ -18,21 +19,7 @@ export const commands = [
     const timeInput = vscode.window.showInputBox({
       title: "How much time?",
       placeHolder: "Enter to ignore",
-      validateInput: (input) => {
-        if (input === "") {
-          return null;
-        }
-
-        if (!/^\d+$/.test(input)) {
-          return "Please enter a number";
-        }
-
-        if (Number(input) < 1) {
-          return "Please enter a number greater than 0";
-        }
-
-        return null;
-      },
+      validateInput: (input) => timerInputValidator(input),
     });
 
     timeInput.then((input) => {
@@ -85,6 +72,25 @@ export const commands = [
         const expectedMessage = ["Branches", "deleted"];
         exec(command, expectedMessage);
       }
+    });
+  }),
+  vscode.commands.registerCommand("mob-vscode-gui.timer", () => {
+    const timeInput = vscode.window.showInputBox({
+      title: "How much time?",
+      placeHolder: "Enter to ignore",
+      validateInput: (input) => timerInputValidator(input),
+    });
+
+    timeInput.then((input) => {
+      let command = "mob timer";
+      const timer = Number(input);
+
+      if (timer > 0) {
+        command += ` ${timer}`;
+      }
+
+      const expectedMessage = ["Happy collaborating!"];
+      exec(command, expectedMessage);
     });
   }),
 ];
