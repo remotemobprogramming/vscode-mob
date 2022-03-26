@@ -64,6 +64,34 @@ function createCommands(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand("mob-vscode-gui.done", () => {
       terminal.sendText("mob done");
     }),
+    vscode.commands.registerCommand("mob-vscode-gui.reset", () => {
+      const validInputs = {
+        yes: ["y", "yes"],
+        no: ["n", "no"],
+      };
+
+      const input = vscode.window.showInputBox({
+        title:
+          "Are you sure? This will delete your commits in the WIP branch (but preserves uncommitted work)",
+        placeHolder: "yes(y) / no(n)",
+        validateInput: (input) => {
+          if (
+            !validInputs.yes.includes(input.toLowerCase()) &&
+            !validInputs.no.includes(input.toLowerCase())
+          ) {
+            return "Please enter yes(y) or no(n)";
+          }
+
+          return null;
+        },
+      });
+
+      input.then((input) => {
+        if (input && validInputs.yes.includes(input)) {
+          terminal.sendText("mob reset");
+        }
+      });
+    }),
   ];
 
   for (const command of commands) {
@@ -114,6 +142,11 @@ function createMobStatusBarItem(context: vscode.ExtensionContext) {
             description: "Commit mob session",
             command: "mob-vscode-gui.done",
           },
+          {
+            label: "Reset",
+            description: "Delete local and remote WIP branch",
+            command: "mob-vscode-gui.reset",
+          },
         ])
         .then((option) => {
           if (option) {
@@ -130,7 +163,7 @@ function createMobStatusBarItem(context: vscode.ExtensionContext) {
 
   item.command = myCommandId;
   item.text = `$(menu) Mob Utils`;
-  item.tooltip = `Done mob session`;
+  item.tooltip = `Menu`;
   item.show();
 
   context.subscriptions.push(item);
