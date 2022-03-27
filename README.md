@@ -4,6 +4,8 @@ Mob VSCode GUI is a wrapper of https://mob.sh/.
 
 ## Features
 
+Usage example: https://www.youtube.com/watch?v=QDZGIozYiIw
+
 - Mob Start to create or enter in the mob temporary branch (you turn).
 - Mob Next to handover to the next person.
 - Mob Done to commit your mob session work.

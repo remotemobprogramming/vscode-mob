@@ -34,8 +34,12 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
 
         const startItem = statusBarItems.find((item) => item.id === "start");
         startItem?.startLoading();
-        await asyncExec(command, expectedMessage);
-        startItem?.stopLoading();
+
+        try {
+          await asyncExec(command, expectedMessage);
+        } finally {
+          startItem?.stopLoading();
+        }
       });
     }),
     vscode.commands.registerCommand("mob-vscode-gui.next", async () => {
@@ -44,8 +48,12 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
 
       const nextItem = statusBarItems.find((item) => item.id === "next");
       nextItem?.startLoading();
-      await asyncExec(command, expectedMessage);
-      nextItem?.stopLoading();
+
+      try {
+        await asyncExec(command, expectedMessage);
+      } finally {
+        nextItem?.stopLoading();
+      }
     }),
     vscode.commands.registerCommand("mob-vscode-gui.done", async () => {
       const command = "mob done";
@@ -53,8 +61,12 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
 
       const utilsItem = statusBarItems.find((item) => item.id === "utils");
       utilsItem?.startLoading("Finishing session...");
-      await asyncExec(command, expectedMessage);
-      utilsItem?.stopLoading();
+
+      try {
+        await asyncExec(command, expectedMessage);
+      } finally {
+        utilsItem?.stopLoading();
+      }
     }),
     vscode.commands.registerCommand("mob-vscode-gui.reset", () => {
       const validInputs = {
@@ -85,8 +97,11 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
 
           const utilsItem = statusBarItems.find((item) => item.id === "utils");
           utilsItem?.startLoading("Reseting session...");
-          await asyncExec(command, expectedMessage);
-          utilsItem?.stopLoading();
+          try {
+            await asyncExec(command, expectedMessage);
+          } finally {
+            utilsItem?.stopLoading();
+          }
         }
       });
     }),
