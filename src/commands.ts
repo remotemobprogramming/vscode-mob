@@ -93,6 +93,32 @@ export const commands = [
       exec(command, expectedMessage);
     });
   }),
+
+  vscode.commands.registerCommand("mob-vscode-gui.mobUtilsClick", async () => {
+    await vscode.window
+      .showQuickPick([
+        {
+          label: "Done",
+          description: "Commit mob session",
+          command: "mob-vscode-gui.done",
+        },
+        {
+          label: "Reset",
+          description: "Delete local and remote WIP branch",
+          command: "mob-vscode-gui.reset",
+        },
+        {
+          label: "Timer",
+          description: "Set timer (in minutes)",
+          command: "mob-vscode-gui.timer",
+        },
+      ])
+      .then((option) => {
+        if (option) {
+          vscode.commands.executeCommand(option.command);
+        }
+      });
+  }),
 ];
 
 function exec(command: string, expectedMessage: string[]) {
