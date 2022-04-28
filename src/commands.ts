@@ -16,31 +16,38 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
         }
       });
     }),
-    vscode.commands.registerCommand("mob-vscode-gui.start", () => {
-      const timeInput = vscode.window.showInputBox({
+    vscode.commands.registerCommand("mob-vscode-gui.start", async () => {
+      const timeInput = await vscode.window.showInputBox({
         title: "How much time?",
         placeHolder: "Enter to ignore",
         validateInput: (input) => timerInputValidator(input),
       });
 
-      timeInput.then(async (input) => {
-        let command = "mob start --include-uncommitted-changes";
-        const expectedMessage = ["Happy collaborating!"];
-        const timer = Number(input);
-
-        if (timer > 0) {
-          command += ` ${timer}`;
-        }
-
-        const startItem = statusBarItems.find((item) => item.id === "start");
-        startItem?.startLoading();
-
-        try {
-          await asyncExec(command, expectedMessage);
-        } finally {
-          startItem?.stopLoading();
-        }
+      const branchName = await vscode.window.showInputBox({
+        title: "Branch name:",
+        placeHolder: "Enter to ignore",
       });
+
+      let command = "mob start --include-uncommitted-changes";
+      const expectedMessage = ["Happy collaborating!"];
+      const timer = Number(timeInput);
+
+      if (timer > 0) {
+        command += ` ${timer}`;
+      }
+
+      if (branchName) {
+        command += ` -b ${branchName}`;
+      }
+
+      const startItem = statusBarItems.find((item) => item.id === "start");
+      startItem?.startLoading();
+
+      try {
+        await asyncExec(command, expectedMessage);
+      } finally {
+        startItem?.stopLoading();
+      }
     }),
     vscode.commands.registerCommand("mob-vscode-gui.next", async () => {
       const command = "mob next";
