@@ -142,11 +142,11 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
               description: "Commit mob session",
               command: "mob-vscode-gui.done",
             },
-            {
-              label: "Reset",
-              description: "Delete local and remote WIP branch",
-              command: "mob-vscode-gui.reset",
-            },
+            // {
+            //   label: "Reset",
+            //   description: "Delete local and remote WIP branch",
+            //   command: "mob-vscode-gui.reset",
+            // },
             {
               label: "Timer",
               description: "Set timer (in minutes)",
