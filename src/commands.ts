@@ -47,9 +47,10 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
       try {
         await asyncExec(command, expectedMessage);
 
-        const timerCountdown = new TimerCountdown();
-        timerCountdown.startTimer(Number(timeInput));
-
+        if (timer > 0) {
+          const timerCountdown = new TimerCountdown();
+          timerCountdown.startTimer(Number(timeInput));
+        }
       } finally {
         startItem?.stopLoading();
       }
