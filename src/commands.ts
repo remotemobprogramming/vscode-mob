@@ -2,6 +2,7 @@ import { exec, ExecException } from "child_process";
 import * as vscode from "vscode";
 import { commandErrorHandler } from "./command-error-handler";
 import { MobStatusBarItem } from "./status-bar-items/mob-status-bar-item";
+import { TimerCountdown } from "./timer-countdown";
 import { timerInputValidator } from "./validators/time-input-validator";
 var commandExists = require("command-exists");
 
@@ -45,6 +46,11 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
 
       try {
         await asyncExec(command, expectedMessage);
+
+        if (timer > 0) {
+          const timerCountdown = new TimerCountdown();
+          timerCountdown.startTimer(Number(timeInput));
+        }
       } finally {
         startItem?.stopLoading();
       }
