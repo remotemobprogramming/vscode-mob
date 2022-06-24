@@ -15,7 +15,7 @@ export class TimerCountdown {
 
       if (distance < 0) {
         clearInterval(interval);
-        vscode.window.showWarningMessage("Your timer is over, please commit your work 🔥");
+        vscode.window.showWarningMessage("Your time is over 🔥");
       }
     }, 1000);
   }
