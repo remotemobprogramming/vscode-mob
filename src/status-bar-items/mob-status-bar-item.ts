@@ -48,7 +48,6 @@ export class MobStatusBarItem {
   }
 
   public startCountDown(minutes: number) {
-    const self = this;
     let seconds = minutes * 60;
 
     if(this._lastSetInterval !== null) {
@@ -57,16 +56,16 @@ export class MobStatusBarItem {
     }
 
    
-    const setIntervalId = setInterval(function () {
+    const setIntervalId = setInterval(() => {
         var date = new Date(0);
         date.setSeconds(seconds); 
         var timeString = date.toISOString().substring(11, 19);
 
-        self._statusBarItem.text = `$(${self._props.icon}) ${timeString}`;
+        this._statusBarItem.text = `$(${this._props.icon}) ${timeString}`;
 
         if (--seconds < 0) {
           clearInterval(setIntervalId);
-          self.stopLoading();
+          this.stopLoading();
         }
     }, 1000);
 
