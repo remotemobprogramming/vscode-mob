@@ -42,7 +42,7 @@ export class MobStatusBarItem {
       clearInterval(this._lastSetInterval);
       this._lastSetInterval = null;
     }
-    
+
     this._statusBarItem.text = `$(${this._props.icon}) ${this._props.name}`;
     this._statusBarItem.show();
   }
@@ -59,7 +59,7 @@ export class MobStatusBarItem {
     this._lastSetInterval = setInterval(function () {
         var date = new Date(0);
         date.setSeconds(seconds); 
-        var timeString = date.toISOString().substr(11, 8);
+        var timeString = date.toISOString().substring(11, 19);
 
         self._statusBarItem.text = `${timeString}`;
 
