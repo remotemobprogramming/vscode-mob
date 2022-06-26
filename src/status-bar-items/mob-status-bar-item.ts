@@ -56,17 +56,21 @@ export class MobStatusBarItem {
       this._lastSetInterval = null;
     }
 
-    this._lastSetInterval = setInterval(function () {
+   
+    const setIntervalId = setInterval(function () {
         var date = new Date(0);
         date.setSeconds(seconds); 
         var timeString = date.toISOString().substring(11, 19);
 
-        self._statusBarItem.text = `${timeString}`;
+        self._statusBarItem.text = `$(${self._props.icon}) ${timeString}`;
 
         if (--seconds < 0) {
-            return;
+          clearInterval(setIntervalId);
+          self.stopLoading();
         }
     }, 1000);
+
+    this._lastSetInterval = setIntervalId;
   }
 
   public dispose() {
