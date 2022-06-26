@@ -11,6 +11,7 @@ interface Props {
 
 export class MobStatusBarItem {
   private _statusBarItem: StatusBarItem;
+  private _lastSetInterval: NodeJS.Timeout | null = null;
 
   constructor(private readonly _props: Props) {
     this._statusBarItem = window.createStatusBarItem(
@@ -37,8 +38,35 @@ export class MobStatusBarItem {
   }
 
   public stopLoading() {
+    if(this._lastSetInterval !== null) {
+      clearInterval(this._lastSetInterval);
+      this._lastSetInterval = null;
+    }
+    
     this._statusBarItem.text = `$(${this._props.icon}) ${this._props.name}`;
     this._statusBarItem.show();
+  }
+
+  public startCountDown(minutes: number) {
+    const self = this;
+    let seconds = minutes * 60;
+
+    if(this._lastSetInterval !== null) {
+      clearInterval(this._lastSetInterval);
+      this._lastSetInterval = null;
+    }
+
+    this._lastSetInterval = setInterval(function () {
+        var date = new Date(0);
+        date.setSeconds(seconds); 
+        var timeString = date.toISOString().substr(11, 8);
+
+        self._statusBarItem.text = `${timeString}`;
+
+        if (--seconds < 0) {
+            return;
+        }
+    }, 1000);
   }
 
   public dispose() {

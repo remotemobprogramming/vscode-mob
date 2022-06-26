@@ -19,7 +19,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
     }),
     vscode.commands.registerCommand("mob-vscode-gui.start", async () => {
       const timeInput = await vscode.window.showInputBox({
-        title: "How much time?",
+        title: "How many minutes?",
         placeHolder: "Enter to ignore",
         validateInput: (input) => timerInputValidator(input),
       });
@@ -49,10 +49,14 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
 
         if (timer > 0) {
           const timerCountdown = new TimerCountdown();
-          timerCountdown.startTimer(Number(timeInput));
+          timerCountdown.startTimer(timer);
         }
       } finally {
         startItem?.stopLoading();
+
+        if (timer > 0) {
+          startItem?.startCountDown(timer)
+        }
       }
     }),
     vscode.commands.registerCommand("mob-vscode-gui.next", async () => {
@@ -66,6 +70,9 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
         await asyncExec(command, expectedMessage);
       } finally {
         nextItem?.stopLoading();
+
+        const startItem = statusBarItems.find((item) => item.id === "start");
+        startItem?.stopLoading();
       }
     }),
     vscode.commands.registerCommand("mob-vscode-gui.done", async () => {
@@ -79,48 +86,14 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
         await asyncExec(command, expectedMessage);
       } finally {
         utilsItem?.stopLoading();
+
+        const startItem = statusBarItems.find((item) => item.id === "start");
+        startItem?.stopLoading();
       }
-    }),
-    vscode.commands.registerCommand("mob-vscode-gui.reset", () => {
-      const validInputs = {
-        yes: ["y", "yes"],
-        no: ["n", "no"],
-      };
-
-      const input = vscode.window.showInputBox({
-        title:
-          "Are you sure? This will delete your commits in the WIP branch (but preserves uncommitted work)",
-        placeHolder: "yes(y) / no(n)",
-        validateInput: (input) => {
-          if (
-            !validInputs.yes.includes(input.toLowerCase()) &&
-            !validInputs.no.includes(input.toLowerCase())
-          ) {
-            return "Please enter yes(y) or no(n)";
-          }
-
-          return null;
-        },
-      });
-
-      input.then(async (input) => {
-        if (input && validInputs.yes.includes(input)) {
-          const command = "mob reset";
-          const expectedMessage = ["Branches", "deleted"];
-
-          const utilsItem = statusBarItems.find((item) => item.id === "utils");
-          utilsItem?.startLoading("Reseting session...");
-          try {
-            await asyncExec(command, expectedMessage);
-          } finally {
-            utilsItem?.stopLoading();
-          }
-        }
-      });
     }),
     vscode.commands.registerCommand("mob-vscode-gui.timer", () => {
       const timeInput = vscode.window.showInputBox({
-        title: "How much time?",
+        title: "How many minutes?",
         placeHolder: "Enter to ignore",
         validateInput: (input) => timerInputValidator(input),
       });
@@ -131,6 +104,9 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
 
         if (timer > 0) {
           command += ` ${timer}`;
+
+          const startItem = statusBarItems.find((item) => item.id === "start");
+          startItem?.startCountDown(timer);
         }
 
         const expectedMessage = ["Happy collaborating!"];
@@ -148,11 +124,6 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
               description: "Commit mob session",
               command: "mob-vscode-gui.done",
             },
-            // {
-            //   label: "Reset",
-            //   description: "Delete local and remote WIP branch",
-            //   command: "mob-vscode-gui.reset",
-            // },
             {
               label: "Timer",
               description: "Set timer (in minutes)",
