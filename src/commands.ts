@@ -12,7 +12,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
       commandExists("mob", function (err: Error, commandExists: boolean) {
         if (!commandExists) {
           vscode.window.showErrorMessage(
-            "Mob command not found. Please install Mob.sh: https://mob.sh"
+            "Mob command not found. Please install mob.sh: https://mob.sh"
           );
         }
       });
@@ -55,7 +55,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
         startItem?.stopLoading();
 
         if (timer > 0) {
-          startItem?.startCountDown(timer)
+          startItem?.startCountDown(timer);
         }
       }
     }),
@@ -144,29 +144,34 @@ async function asyncExec(
   command: string,
   expectedMessage: string[]
 ): Promise<void> {
-  if (vscode.workspace.workspaceFolders?.length !== 1) {
-    vscode.window.showWarningMessage(
-      `1 workspace folder required. Found ${Number(
-        vscode.workspace.workspaceFolders?.length
-      )}`
-    );
-    return;
+  if(vscode.workspace.workspaceFolders?.length !== undefined) {
+    let workspace: string | undefined = vscode.workspace.workspaceFolders[0].uri.fsPath;
+    
+    if(vscode.workspace.workspaceFolders.length > 1) {
+      const allFoldersName = vscode.workspace.workspaceFolders?.map((folder) => folder.uri.fsPath);
+      workspace = await vscode.window.showQuickPick(allFoldersName, {
+        title: 'Choose a workspace'
+      }); 
+    } 
+
+    return new Promise((resolve, reject) => {
+      exec(
+        command,
+        { cwd: workspace },
+        (error: ExecException | null, stdout: string, stderr: string) => {
+          commandErrorHandler({ expectedMessage, error, stdout, stderr });
+          if (error) {
+            reject(error);
+            return;
+          }
+          resolve();
+        }
+      );
+    });
   }
 
-  const cwd = vscode.workspace.workspaceFolders[0].uri.fsPath;
-
-  return new Promise((resolve, reject) => {
-    exec(
-      command,
-      { cwd },
-      (error: ExecException | null, stdout: string, stderr: string) => {
-        commandErrorHandler({ expectedMessage, error, stdout, stderr });
-        if (error) {
-          reject(error);
-          return;
-        }
-        resolve();
-      }
-    );
-  });
+  vscode.window.showWarningMessage(
+    'At least one workspace folder is required'
+  );
+  return;
 }
