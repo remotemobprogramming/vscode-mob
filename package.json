@@ -2,7 +2,7 @@
   "name": "mob-vscode-gui",
   "displayName": "Mob VSCode GUI",
   "description": "A mob.sh wrapper",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "icon": "images/mob.png",
   "keywords": [
     "mob",
