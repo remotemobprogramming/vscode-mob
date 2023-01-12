@@ -6,6 +6,9 @@ import { TimerCountdown } from "./timer-countdown";
 import { timerInputValidator } from "./validators/time-input-validator";
 var commandExists = require("command-exists");
 
+let GLOBAL_WORKSPACE = "";
+const MOB_LAST_FILE_TOKEN = "mob-sh-last-file:";
+
 export function commandFactory(statusBarItems: MobStatusBarItem[]) {
   return [
     vscode.commands.registerCommand("mob-vscode-gui.mobCommandExists", () => {
@@ -46,6 +49,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
 
       try {
         await asyncExec(command, expectedMessage);
+        await openLastFile();
 
         if (timer > 0) {
           const timerCountdown = new TimerCountdown();
@@ -68,6 +72,24 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
 
       try {
         await asyncExec(command, expectedMessage);
+
+        const currentActiveFile =
+          vscode.window.activeTextEditor?.document.uri?.fsPath;
+        const workspaceRoots = vscode.workspace.workspaceFolders;
+        if (currentActiveFile && workspaceRoots) {
+          const workspaceRoot = workspaceRoots.find((folder) =>
+            currentActiveFile.includes(folder.name)
+          )?.name;
+
+          if (workspaceRoot) {
+            const workspacePosition = currentActiveFile.indexOf(workspaceRoot);
+            const relativePath = currentActiveFile.slice(workspacePosition);
+            await asyncExec(
+              `git notes add -f -m "${MOB_LAST_FILE_TOKEN}${relativePath}"`,
+              []
+            );
+          }
+        }
       } finally {
         nextItem?.stopLoading();
 
@@ -140,24 +162,34 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
   ];
 }
 
+async function setWorkspace(
+  vsCodeWorkspaceFolders: readonly vscode.WorkspaceFolder[]
+): Promise<void> {
+  let workspace = vsCodeWorkspaceFolders[0].uri.fsPath;
+
+  if (vsCodeWorkspaceFolders.length > 1) {
+    const allFoldersName = vsCodeWorkspaceFolders?.map(
+      (folder) => folder.uri.fsPath
+    );
+    workspace = (await vscode.window.showQuickPick(allFoldersName, {
+      title: "Choose a workspace",
+    })) as string;
+  }
+
+  GLOBAL_WORKSPACE = workspace;
+}
+
 async function asyncExec(
   command: string,
   expectedMessage: string[]
 ): Promise<void> {
-  if(vscode.workspace.workspaceFolders?.length !== undefined) {
-    let workspace: string | undefined = vscode.workspace.workspaceFolders[0].uri.fsPath;
-    
-    if(vscode.workspace.workspaceFolders.length > 1) {
-      const allFoldersName = vscode.workspace.workspaceFolders?.map((folder) => folder.uri.fsPath);
-      workspace = await vscode.window.showQuickPick(allFoldersName, {
-        title: 'Choose a workspace'
-      }); 
-    } 
+  if (vscode.workspace.workspaceFolders?.length !== undefined) {
+    await setWorkspace(vscode.workspace.workspaceFolders);
 
     return new Promise((resolve, reject) => {
       exec(
         command,
-        { cwd: workspace },
+        { cwd: GLOBAL_WORKSPACE },
         (error: ExecException | null, stdout: string, stderr: string) => {
           commandErrorHandler({ expectedMessage, error, stdout, stderr });
           if (error) {
@@ -170,8 +202,47 @@ async function asyncExec(
     });
   }
 
-  vscode.window.showWarningMessage(
-    'At least one workspace folder is required'
-  );
+  vscode.window.showWarningMessage("At least one workspace folder is required");
   return;
+}
+
+async function openLastFile() {
+  return new Promise((resolve, reject) => {
+    exec(
+      "git rev-parse HEAD",
+      { cwd: GLOBAL_WORKSPACE },
+      (error: ExecException | null, stdout: string, stderr: string) => {
+        const hash = stdout;
+        exec(
+          `git notes show ${hash}`,
+          { cwd: GLOBAL_WORKSPACE },
+          (error: ExecException | null, stdout: string, stderr: string) => {
+            const lastFileIndexOf = stdout.indexOf(MOB_LAST_FILE_TOKEN);
+            if (lastFileIndexOf === -1) {
+              return resolve(null);
+            }
+
+            const fileName = stdout.slice(
+              lastFileIndexOf + MOB_LAST_FILE_TOKEN.length
+            );
+            const globalWorksPaceSplits = GLOBAL_WORKSPACE.split("/");
+            globalWorksPaceSplits.pop();
+
+            const fileToOpen = (
+              globalWorksPaceSplits.join("/") +
+              "/" +
+              fileName
+            ).trim();
+            vscode.workspace.openTextDocument(fileToOpen).then(
+              (doc) => {
+                vscode.window.showTextDocument(doc, { preview: false });
+              },
+              (err) => console.error(err)
+            );
+          }
+        );
+      }
+    );
+    return resolve(null);
+  });
 }
