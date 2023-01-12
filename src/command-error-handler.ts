@@ -8,7 +8,7 @@ export function commandErrorHandler(data: {
   stderr: string;
 }) {
   const { expectedMessage, error, stdout, stderr } = data;
-  console.debug(stdout);
+
   if (error) {
     vscode.window.showWarningMessage(`${error.message}: ${stdout}`);
     return;
