@@ -64,7 +64,15 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
       }
     }),
     vscode.commands.registerCommand("mob-vscode-gui.next", async () => {
-      const command = "mob next";
+      const commitMessageInput = await vscode.window.showInputBox({
+        title: "Please enter the commit message:",
+        placeHolder: "Enter to ignore",
+      });
+
+      let command = "mob next";
+      if (commitMessageInput !== "") {
+        command = `mob next -m '${commitMessageInput}'`;
+      }
       const expectedMessage = ["git push --no-verify"];
 
       const nextItem = statusBarItems.find((item) => item.id === "next");
