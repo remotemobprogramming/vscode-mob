@@ -1,15 +1,19 @@
-import { exec, ExecException } from "child_process";
+import { ExecException } from "child_process";
 import * as vscode from "vscode";
 import { commandErrorHandler } from "./command-error-handler";
 import { MobStatusBarItem } from "./status-bar-items/mob-status-bar-item";
 import { TimerCountdown } from "./timer-countdown";
 import { timerInputValidator } from "./validators/time-input-validator";
+const { promisify } = require('util');
+const exec = promisify(require('child_process').exec);
 var commandExists = require("command-exists");
 
 let GLOBAL_WORKSPACE = "";
 const MOB_LAST_FILE_TOKEN = "mob-sh-last-file:";
 
 export function commandFactory(statusBarItems: MobStatusBarItem[]) {
+  const timerCountdown = new TimerCountdown();
+
   return [
     vscode.commands.registerCommand("mob-vscode-gui.mobCommandExists", () => {
       commandExists("mob", function (err: Error, commandExists: boolean) {
@@ -48,15 +52,15 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
       startItem?.startLoading();
 
       try {
-        await asyncExec(command, expectedMessage);
+        await runCommand(command, expectedMessage);
         await openLastFile();
 
         if (timer > 0) {
-          const timerCountdown = new TimerCountdown();
           timerCountdown.startTimer(timer);
         }
       } finally {
         startItem?.stopLoading();
+        timerCountdown.stopTimer();
 
         if (timer > 0) {
           startItem?.startCountDown(timer);
@@ -64,22 +68,27 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
       }
     }),
     vscode.commands.registerCommand("mob-vscode-gui.next", async () => {
-      const commitMessageInput = await vscode.window.showInputBox({
-        title: "Please enter the commit message:",
-        placeHolder: "Enter to ignore",
-      });
-
-      let command = "mob next";
-      if (commitMessageInput !== "") {
-        command = `mob next -m '${commitMessageInput}'`;
-      }
-      const expectedMessage = ["git push --no-verify"];
-
       const nextItem = statusBarItems.find((item) => item.id === "next");
       nextItem?.startLoading();
 
       try {
-        await asyncExec(command, expectedMessage);
+        const mobRequireCommitMessage = await getConfig('MOB_REQUIRE_COMMIT_MESSAGE') === 'true';
+
+        let commitMessageInput: string | undefined;
+        if (mobRequireCommitMessage) {
+          commitMessageInput = await vscode.window.showInputBox({
+            title: "Please enter the commit message:",
+            placeHolder: "Enter to ignore",
+          });
+        }
+
+        let command = "mob next";
+        if (commitMessageInput) {
+          command = `mob next -m '${commitMessageInput}'`;
+        }
+        const expectedMessage = ["git push --no-verify"];
+
+        await runCommand(command, expectedMessage);
 
         const currentActiveFile =
           vscode.window.activeTextEditor?.document.uri?.fsPath;
@@ -92,7 +101,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
           if (workspaceRoot) {
             const workspacePosition = currentActiveFile.indexOf(workspaceRoot);
             const relativePath = currentActiveFile.slice(workspacePosition);
-            await asyncExec(
+            await runCommand(
               `git notes add -f -m "${MOB_LAST_FILE_TOKEN}${relativePath}"`,
               []
             );
@@ -103,6 +112,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
 
         const startItem = statusBarItems.find((item) => item.id === "start");
         startItem?.stopLoading();
+        timerCountdown.stopTimer();
       }
     }),
     vscode.commands.registerCommand("mob-vscode-gui.done", async () => {
@@ -113,12 +123,13 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
       utilsItem?.startLoading("Finishing session...");
 
       try {
-        await asyncExec(command, expectedMessage);
+        await runCommand(command, expectedMessage);
       } finally {
         utilsItem?.stopLoading();
 
         const startItem = statusBarItems.find((item) => item.id === "start");
         startItem?.stopLoading();
+        timerCountdown.stopTimer();
       }
     }),
     vscode.commands.registerCommand("mob-vscode-gui.timer", () => {
@@ -140,7 +151,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
         }
 
         const expectedMessage = ["Happy collaborating!"];
-        asyncExec(command, expectedMessage);
+        runCommand(command, expectedMessage);
       });
     }),
 
@@ -187,31 +198,40 @@ async function setWorkspace(
   GLOBAL_WORKSPACE = workspace;
 }
 
-async function asyncExec(
+async function runCommand(
   command: string,
   expectedMessage: string[]
-): Promise<void> {
+): Promise<string | null> {
   if (vscode.workspace.workspaceFolders?.length !== undefined) {
     await setWorkspace(vscode.workspace.workspaceFolders);
 
-    return new Promise((resolve, reject) => {
-      exec(
-        command,
-        { cwd: GLOBAL_WORKSPACE },
-        (error: ExecException | null, stdout: string, stderr: string) => {
-          commandErrorHandler({ expectedMessage, error, stdout, stderr });
-          if (error) {
-            reject(error);
-            return;
-          }
-          resolve();
-        }
-      );
-    });
+    try {
+      const result = await exec(command, { cwd: GLOBAL_WORKSPACE });
+      commandErrorHandler({ expectedMessage, stdout: result.stdout });
+      return result.stdout;
+    } catch (error: any) {
+      console.error(error.message);
+
+      vscode.window.showWarningMessage(`${error?.message}  ${error?.stderr} ${error?.stdout}`);
+
+      throw error;
+    }
   }
 
   vscode.window.showWarningMessage("At least one workspace folder is required");
-  return;
+  return null;
+}
+
+async function getConfig(configName: string): Promise<string | null> {
+  const result = await runCommand('mob config', []);
+  const configLine = result?.split("\n").find((config) => config.includes(configName));
+
+  if (configLine) {
+    const cutIndex = configLine.indexOf('=') + 1;
+    return configLine.slice(cutIndex);
+  }
+
+  return null;
 }
 
 async function openLastFile() {
