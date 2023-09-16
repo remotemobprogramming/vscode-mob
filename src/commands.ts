@@ -9,7 +9,6 @@ const exec = promisify(require('child_process').exec);
 var commandExists = require("command-exists");
 
 let GLOBAL_WORKSPACE = "";
-const MOB_LAST_FILE_TOKEN = "mob-sh-last-file:";
 
 export function commandFactory(statusBarItems: MobStatusBarItem[]) {
   const timerCountdown = new TimerCountdown();
@@ -53,7 +52,6 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
 
       try {
         await runCommand(command, expectedMessage);
-        await openLastFile();
 
         if (timer > 0) {
           timerCountdown.startTimer(timer);
@@ -89,24 +87,6 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
         const expectedMessage = ["git push --no-verify"];
 
         await runCommand(command, expectedMessage);
-
-        const currentActiveFile =
-          vscode.window.activeTextEditor?.document.uri?.fsPath;
-        const workspaceRoots = vscode.workspace.workspaceFolders;
-        if (currentActiveFile && workspaceRoots) {
-          const workspaceRoot = workspaceRoots.find((folder) =>
-            currentActiveFile.includes(folder.name)
-          )?.name;
-
-          if (workspaceRoot) {
-            const workspacePosition = currentActiveFile.indexOf(workspaceRoot);
-            const relativePath = currentActiveFile.slice(workspacePosition);
-            await runCommand(
-              `git notes add -f -m "${MOB_LAST_FILE_TOKEN}${relativePath}"`,
-              []
-            );
-          }
-        }
       } finally {
         nextItem?.stopLoading();
 
@@ -232,45 +212,4 @@ async function getConfig(configName: string): Promise<string | null> {
   }
 
   return null;
-}
-
-async function openLastFile() {
-  return new Promise((resolve, reject) => {
-    exec(
-      "git rev-parse HEAD",
-      { cwd: GLOBAL_WORKSPACE },
-      (error: ExecException | null, stdout: string, stderr: string) => {
-        const hash = stdout;
-        exec(
-          `git notes show ${hash}`,
-          { cwd: GLOBAL_WORKSPACE },
-          (error: ExecException | null, stdout: string, stderr: string) => {
-            const lastFileIndexOf = stdout.indexOf(MOB_LAST_FILE_TOKEN);
-            if (lastFileIndexOf === -1) {
-              return resolve(null);
-            }
-
-            const fileName = stdout.slice(
-              lastFileIndexOf + MOB_LAST_FILE_TOKEN.length
-            );
-            const globalWorksPaceSplits = GLOBAL_WORKSPACE.split("/");
-            globalWorksPaceSplits.pop();
-
-            const fileToOpen = (
-              globalWorksPaceSplits.join("/") +
-              "/" +
-              fileName
-            ).trim();
-            vscode.workspace.openTextDocument(fileToOpen).then(
-              (doc) => {
-                vscode.window.showTextDocument(doc, { preview: false });
-              },
-              (err) => console.error(err)
-            );
-          }
-        );
-      }
-    );
-    return resolve(null);
-  });
 }
