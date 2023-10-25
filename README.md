@@ -1,6 +1,6 @@
-# Mob VSCode GUI
+# VSCode Mob
 
-Mob VSCode GUI is a wrapper of https://mob.sh/.
+VSCode Mob is a wrapper of https://mob.sh/.
 
 ## Features
 

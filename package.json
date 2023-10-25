@@ -1,8 +1,8 @@
 {
-  "name": "mob-vscode-gui",
-  "displayName": "Mob VSCode GUI",
+  "name": "vscode-mob",
+  "displayName": "VSCode Mob",
   "description": "A mob.sh wrapper",
-  "version": "2.4.1",
+  "version": "2.5.0",
   "icon": "images/mob.png",
   "keywords": [
     "mob",
@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/alessandrosangalli/mob-vscode-gui.git"
+    "url": "https://github.com/alessandrosangalli/vscode-mob.git"
   },
   "categories": [
     "Other",

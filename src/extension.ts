@@ -13,7 +13,7 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(command);
   }
 
-  vscode.commands.executeCommand("mob-vscode-gui.mobCommandExists");
+  vscode.commands.executeCommand("vscode-mob.mobCommandExists");
 }
 
 export function deactivate() {}
