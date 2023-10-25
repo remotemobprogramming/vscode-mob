@@ -1,4 +1,3 @@
-import { ExecException } from "child_process";
 import * as vscode from "vscode";
 import { commandErrorHandler } from "./command-error-handler";
 import { MobStatusBarItem } from "./status-bar-items/mob-status-bar-item";
@@ -14,7 +13,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
   const timerCountdown = new TimerCountdown();
 
   return [
-    vscode.commands.registerCommand("mob-vscode-gui.mobCommandExists", () => {
+    vscode.commands.registerCommand("vscode-mob.mobCommandExists", () => {
       commandExists("mob", function (err: Error, commandExists: boolean) {
         if (!commandExists) {
           vscode.window.showErrorMessage(
@@ -23,7 +22,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
         }
       });
     }),
-    vscode.commands.registerCommand("mob-vscode-gui.start", async () => {
+    vscode.commands.registerCommand("vscode-mob.start", async () => {
       const timeInput = await vscode.window.showInputBox({
         title: "How many minutes?",
         placeHolder: "Enter to ignore",
@@ -65,7 +64,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
         }
       }
     }),
-    vscode.commands.registerCommand("mob-vscode-gui.next", async () => {
+    vscode.commands.registerCommand("vscode-mob.next", async () => {
       const nextItem = statusBarItems.find((item) => item.id === "next");
       nextItem?.startLoading();
 
@@ -95,7 +94,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
         timerCountdown.stopTimer();
       }
     }),
-    vscode.commands.registerCommand("mob-vscode-gui.done", async () => {
+    vscode.commands.registerCommand("vscode-mob.done", async () => {
       const command = "mob done";
       const expectedMessage = ["To finish, use"];
 
@@ -112,7 +111,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
         timerCountdown.stopTimer();
       }
     }),
-    vscode.commands.registerCommand("mob-vscode-gui.timer", () => {
+    vscode.commands.registerCommand("vscode-mob.timer", () => {
       const timeInput = vscode.window.showInputBox({
         title: "How many minutes?",
         placeHolder: "Enter to ignore",
@@ -136,19 +135,19 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
     }),
 
     vscode.commands.registerCommand(
-      "mob-vscode-gui.mobUtilsClick",
+      "vscode-mob.mobUtilsClick",
       async () => {
         await vscode.window
           .showQuickPick([
             {
               label: "Done",
               description: "Commit mob session",
-              command: "mob-vscode-gui.done",
+              command: "vscode-mob.done",
             },
             {
               label: "Timer",
               description: "Set timer (in minutes)",
-              command: "mob-vscode-gui.timer",
+              command: "vscode-mob.timer",
             },
           ])
           .then((option) => {
