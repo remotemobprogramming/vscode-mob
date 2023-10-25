@@ -5,7 +5,7 @@ export function mobStatusBarItemsFactory(): MobStatusBarItem[] {
     id: "start",
     icon: "debug-start",
     name: "Mob Start",
-    command: "vscode-mob.start",
+    command: "mob-vscode-gui.start",
     tooltip: "Start you turn",
     priority: 3,
   });
@@ -14,7 +14,7 @@ export function mobStatusBarItemsFactory(): MobStatusBarItem[] {
     id: "next",
     icon: "debug-step-over",
     name: "Mob Next",
-    command: "vscode-mob.next",
+    command: "mob-vscode-gui.next",
     tooltip: "Next turn",
     priority: 2,
   });
@@ -23,7 +23,7 @@ export function mobStatusBarItemsFactory(): MobStatusBarItem[] {
     id: "utils",
     icon: "menu",
     name: "Mob Utils",
-    command: "vscode-mob.mobUtilsClick",
+    command: "mob-vscode-gui.mobUtilsClick",
     tooltip: "Menu",
     priority: 1,
   });
