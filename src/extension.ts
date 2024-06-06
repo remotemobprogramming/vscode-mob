@@ -8,7 +8,8 @@ export function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(statusBarItem);
   }
 
-  const commands = commandFactory(statusBarItems);
+  const mobExecutionCommand = vscode.workspace.getConfiguration().get<string>('mob-vscode-gui.mobExecutionCommand', 'mob');
+  const commands = commandFactory(mobExecutionCommand, statusBarItems);
   for (const command of commands) {
     context.subscriptions.push(command);
   }

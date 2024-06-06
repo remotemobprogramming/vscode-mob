@@ -24,7 +24,8 @@ Install https://mob.sh/.
 
 ## Extension Settings
 
-No settings yet.
+### Mob Execution Command
+To change the default mob execution command, update the "Mob Execution Command" setting.
 
 ## Known Issues
 

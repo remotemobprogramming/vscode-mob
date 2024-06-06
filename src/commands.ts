@@ -9,15 +9,15 @@ var commandExists = require("command-exists");
 
 let GLOBAL_WORKSPACE = "";
 
-export function commandFactory(statusBarItems: MobStatusBarItem[]) {
+export function commandFactory(mobExecutionCommand: string, statusBarItems: MobStatusBarItem[]) {
   const timerCountdown = new TimerCountdown();
 
   return [
     vscode.commands.registerCommand("mob-vscode-gui.mobCommandExists", () => {
-      commandExists("mob", function (err: Error, commandExists: boolean) {
+      commandExists(mobExecutionCommand, function (err: Error, commandExists: boolean) {
         if (!commandExists) {
           vscode.window.showErrorMessage(
-            "Mob command not found. Please install mob.sh: https://mob.sh"
+            "Mob command not found. Please install mob.sh: https://mob.sh or change the mobExecutionCommand setting."
           );
         }
       });
@@ -34,7 +34,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
         placeHolder: "Enter to ignore",
       });
 
-      let command = "mob start --include-uncommitted-changes";
+      let command = mobExecutionCommand + " start --include-uncommitted-changes";
       const expectedMessage = ["Happy collaborating!"];
       const timer = Number(timeInput);
 
@@ -69,7 +69,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
       nextItem?.startLoading();
 
       try {
-        const mobRequireCommitMessage = await getConfig('MOB_REQUIRE_COMMIT_MESSAGE') === 'true';
+        const mobRequireCommitMessage = await getConfig('MOB_REQUIRE_COMMIT_MESSAGE', mobExecutionCommand) === 'true';
 
         let commitMessageInput: string | undefined;
         if (mobRequireCommitMessage) {
@@ -79,9 +79,9 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
           });
         }
 
-        let command = "mob next";
+        let command = mobExecutionCommand + " next";
         if (commitMessageInput) {
-          command = `mob next -m '${commitMessageInput}'`;
+          command = mobExecutionCommand + ` next -m '${commitMessageInput}'`;
         }
         const expectedMessage = ["git push --no-verify"];
 
@@ -95,7 +95,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
       }
     }),
     vscode.commands.registerCommand("mob-vscode-gui.done", async () => {
-      const command = "mob done";
+      const command = mobExecutionCommand + " done";
       const expectedMessage = ["To finish, use"];
 
       const utilsItem = statusBarItems.find((item) => item.id === "utils");
@@ -119,7 +119,7 @@ export function commandFactory(statusBarItems: MobStatusBarItem[]) {
       });
 
       timeInput.then((input) => {
-        let command = "mob timer";
+        let command = mobExecutionCommand + " timer";
         const timer = Number(input);
 
         if (timer > 0) {
@@ -201,8 +201,8 @@ async function runCommand(
   return null;
 }
 
-async function getConfig(configName: string): Promise<string | null> {
-  const result = await runCommand('mob config', []);
+async function getConfig(configName: string, mobExecutionCommand: string): Promise<string | null> {
+  const result = await runCommand(mobExecutionCommand + ' config', []);
   const configLine = result?.split("\n").find((config) => config.includes(configName));
 
   if (configLine) {

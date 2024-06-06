@@ -2,7 +2,7 @@
   "name": "mob-vscode-gui",
   "displayName": "Mob",
   "description": "A mob.sh wrapper",
-  "version": "2.5.0",
+  "version": "2.6.0",
   "icon": "images/mob.png",
   "keywords": [
     "mob",
@@ -28,7 +28,19 @@
     "*"
   ],
   "main": "./dist/extension.js",
-  "contributes": {},
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "Your Extension Configuration",
+      "properties": {
+        "yourExtension.mobExecutionCommand": {
+          "type": "string",
+          "default": "mob",
+          "description": "Change the default mob execution command"
+        }
+      }
+    }
+  },
   "scripts": {
     "vscode:prepublish": "npm run package",
     "compile": "webpack",
