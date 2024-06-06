@@ -33,7 +33,7 @@
       "type": "object",
       "title": "Your Extension Configuration",
       "properties": {
-        "yourExtension.mobExecutionCommand": {
+        "mob-vscode-gui.mobExecutionCommand": {
           "type": "string",
           "default": "mob",
           "description": "Change the default mob execution command"
